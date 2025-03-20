@@ -23,7 +23,9 @@ export default async function Home() {
   let decodedToken: DecodedToken = {};
   try {
     if (session.tokenSet?.accessToken) {
+      console.log(session.tokenSet.accessToken);
       const parts = session.tokenSet.accessToken.split('.');
+
       if (parts.length === 3) {
         decodedToken = JSON.parse(atob(parts[1]));
       }
