@@ -69,10 +69,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [auth0User, auth0Loading]);
 
-  // Redirect authenticated users from welcome page to todos
+  // Redirect authenticated users from welcome page to todos - with safeguards
   useEffect(() => {
-    if (!isLoading && user && pathname === "/") {
-      router.push("/todos");
+    // Only redirect if:
+    // 1. We know the auth state for sure (not loading)
+    // 2. User is authenticated
+    // 3. We're on the home page
+    // 4. We're not in the middle of an Auth0 callback flow
+    if (!isLoading && user && pathname === "/" && !window.location.href.includes('/api/auth')) {
+      // Add a small delay to avoid conflict with Auth0 routing
+      const redirectTimer = setTimeout(() => {
+        router.push("/todos");
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [isLoading, user, pathname, router]);
 
