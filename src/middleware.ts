@@ -32,6 +32,13 @@ const addSecurityHeaders = (request: NextRequest) => {
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
   
+  // Add Content Security Policy to allow Supabase connections
+  // REMOVED: CSP is now set in next.config.js to avoid conflicts
+  // headers.set(
+  //   'Content-Security-Policy',
+  //   "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://pyjqiqshzvqofdevqesh.supabase.co wss://pyjqiqshzvqofdevqesh.supabase.co https://dev-fdqihp1xqcw7u2kv.us.auth0.com;"
+  // );
+  
   return response;
 };
 

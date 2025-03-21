@@ -11,7 +11,7 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
-  const formattedDate = formatDistanceToNow(new Date(todo.createdAt), {
+  const formattedDate = formatDistanceToNow(new Date(todo.created_at), {
     addSuffix: true,
   });
 
