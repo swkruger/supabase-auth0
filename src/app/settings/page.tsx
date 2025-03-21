@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
 export default function SettingsPage() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, isAdmin, hasPermission } = useAuth();
   const router = useRouter();
   
   // Protect this page
@@ -100,6 +100,103 @@ export default function SettingsPage() {
                 </p>
               </div>
               <Button onClick={logout} variant="outline">Log out</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Permissions</CardTitle>
+          <CardDescription>Your user roles and permissions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">Admin Status</h3>
+              {isAdmin ? (
+                <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 px-3 py-1 rounded-full text-sm">
+                  Admin
+                </div>
+              ) : (
+                <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                  Regular User
+                </div>
+              )}
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Roles</h3>
+              <div className="flex flex-wrap gap-2">
+                {user.roles && user.roles.length > 0 ? (
+                  user.roles.map((role, index) => (
+                    <div key={index} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                      {role}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No roles assigned</p>
+                )}
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Permissions</h3>
+              <div className="flex flex-wrap gap-2">
+                {user.permissions && user.permissions.length > 0 ? (
+                  user.permissions.map((permission, index) => (
+                    <div key={index} className="bg-muted px-3 py-1 rounded-full text-sm">
+                      {permission}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No specific permissions assigned</p>
+                )}
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Permission Checks</h3>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">read:todos</span>
+                  {hasPermission('read:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">create:todos</span>
+                  {hasPermission('create:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">update:todos</span>
+                  {hasPermission('update:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">delete:todos</span>
+                  {hasPermission('delete:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

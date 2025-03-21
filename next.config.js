@@ -2,14 +2,44 @@
 const nextConfig = {
   /* config options here */
   env: {
-    AUTH0_SECRET: process.env.AUTH0_SECRET,
-    AUTH0_BASE_URL: process.env.AUTH0_BASE_URL,
-    AUTH0_ISSUER_BASE_URL: process.env.AUTH0_ISSUER_BASE_URL,
-    AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
-    AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
-    AUTH0_REDIRECT_URI: process.env.AUTH0_REDIRECT_URI,
-    AUTH0_POST_LOGOUT_REDIRECT_URI: process.env.AUTH0_POST_LOGOUT_REDIRECT_URI
-  }
+    // Only expose public variables to the client
+    NEXT_PUBLIC_AUTH0_BASE_URL: process.env.AUTH0_BASE_URL,
+    NEXT_PUBLIC_AUTH0_ISSUER_BASE_URL: process.env.AUTH0_ISSUER_BASE_URL,
+  },
+  // Add security headers
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.auth0.com;",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig; 
