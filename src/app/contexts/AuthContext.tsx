@@ -49,10 +49,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!auth0Loading) {
       if (auth0User) {
-        // In a real app, roles and permissions would come from Auth0 user metadata
-        // For now, we'll simulate by setting mock data or using Auth0 data if available
-        const roles = auth0User.roles || ['user']; // Default to 'user' role
-        const permissions = auth0User.permissions || [];
+        // Get roles and permissions from Auth0 user data
+        // Auth0 provides roles and permissions through namespaced claims in the token
+        const namespace = 'https://fifolio.app.com'; // Custom namespace for your application
+        
+        // Debug: Log the Auth0 user object structure in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth0 User Object:', JSON.stringify(auth0User, null, 2));
+          
+          // Check and log all possible role/permission locations to help identify the source
+          const possibleRoleLocations = [
+            { name: 'namespace/roles', value: auth0User[`${namespace}/roles`] },
+            { name: 'https://fifolio.com/roles', value: auth0User['https://fifolio.com/roles'] },
+            { name: 'user_metadata.roles', value: (auth0User['https://fifolio.com/user_metadata'] as any)?.roles },
+            { name: 'app_metadata.roles', value: (auth0User['https://fifolio.com/app_metadata'] as any)?.roles },
+            { name: 'roles', value: auth0User.roles },
+            { name: 'https://auth0.com/roles', value: auth0User['https://auth0.com/roles'] },
+            { name: 'https://fifolio.auth0.com/roles', value: auth0User['https://fifolio.auth0.com/roles'] },
+            { name: 'http://fifolio.com/roles', value: auth0User['http://fifolio.com/roles'] },
+          ];
+          
+          console.log('Role locations found:', possibleRoleLocations.filter(loc => loc.value !== undefined));
+          console.log('Permission locations found:', [
+            { name: 'namespace/permissions', value: auth0User[`${namespace}/permissions`] },
+            { name: 'https://fifolio.com/permissions', value: auth0User['https://fifolio.com/permissions'] },
+            { name: 'user_metadata.permissions', value: (auth0User['https://fifolio.com/user_metadata'] as any)?.permissions },
+            { name: 'app_metadata.permissions', value: (auth0User['https://fifolio.com/app_metadata'] as any)?.permissions },
+            { name: 'permissions', value: auth0User.permissions },
+            { name: 'https://auth0.com/permissions', value: auth0User['https://auth0.com/permissions'] },
+            { name: 'https://fifolio.auth0.com/permissions', value: auth0User['https://fifolio.auth0.com/permissions'] },
+            { name: 'http://fifolio.com/permissions', value: auth0User['http://fifolio.com/permissions'] },
+          ].filter(loc => loc.value !== undefined));
+        }
+        
+        // Check different possible locations for roles
+        const roles = 
+          auth0User[`${namespace}/roles`] || 
+          auth0User[`https://fifolio.com/roles`] || // Alternative namespace
+          (auth0User[`https://fifolio.com/user_metadata`] as any)?.roles ||
+          (auth0User[`https://fifolio.com/app_metadata`] as any)?.roles ||
+          auth0User.roles || 
+          auth0User['https://auth0.com/roles'] || // Common Auth0 namespace
+          auth0User['https://fifolio.auth0.com/roles'] || // Tenant-specific namespace
+          auth0User['http://fifolio.com/roles'] || // Alternative non-HTTPS namespace
+          ['user']; // Default role
+        
+        // Check different possible locations for permissions
+        const permissions = 
+          auth0User[`${namespace}/permissions`] || 
+          auth0User[`https://fifolio.com/permissions`] || // Alternative namespace
+          (auth0User[`https://fifolio.com/user_metadata`] as any)?.permissions ||
+          (auth0User[`https://fifolio.com/app_metadata`] as any)?.permissions ||
+          auth0User.permissions || 
+          auth0User['https://auth0.com/permissions'] || // Common Auth0 namespace
+          auth0User['https://fifolio.auth0.com/permissions'] || // Tenant-specific namespace
+          auth0User['http://fifolio.com/permissions'] || // Alternative non-HTTPS namespace
+          [];
 
         setUser({
           id: auth0User.sub || '',
