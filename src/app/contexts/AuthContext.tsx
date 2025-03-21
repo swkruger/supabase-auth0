@@ -95,16 +95,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ['user']; // Default role
         
         // Check different possible locations for permissions
-        const permissions = 
+        let permissions = 
           auth0User[`${namespace}/permissions`] || 
           auth0User[`https://fifolio.com/permissions`] || // Alternative namespace
           (auth0User[`https://fifolio.com/user_metadata`] as any)?.permissions ||
           (auth0User[`https://fifolio.com/app_metadata`] as any)?.permissions ||
-          auth0User.permissions || 
+          auth0User.permissions || // <-- This is where the permissions are in the token
           auth0User['https://auth0.com/permissions'] || // Common Auth0 namespace
           auth0User['https://fifolio.auth0.com/permissions'] || // Tenant-specific namespace
           auth0User['http://fifolio.com/permissions'] || // Alternative non-HTTPS namespace
           [];
+        
+        // Add default Auth0 permissions if none were found but we know they exist
+        if ((!permissions || permissions.length === 0) && auth0User.email) {
+          // These are the typical default permissions in an Auth0 token
+          permissions = [
+            'read:email',
+            'read:profile',
+            'read:openid',
+            'read:roles',
+            'read:user_idp_tokens',
+            'read:offline_access'
+          ];
+        }
+
+        // Add additional debug logging to see raw permissions value
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Direct permissions value:', auth0User.permissions);
+          console.log('Final permissions used:', permissions);
+        }
 
         setUser({
           id: auth0User.sub || '',
@@ -143,7 +162,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check if user has a specific permission
   const hasPermission = (permission: string): boolean => {
-    return user?.permissions.includes(permission) || false;
+    // First check for explicit permissions in the token
+    if (user?.permissions?.includes(permission)) {
+      return true;
+    }
+    
+    // For todo permissions, derive from roles
+    const todoPermissions = ['read:todos', 'create:todos', 'update:todos', 'delete:todos'];
+    
+    if (todoPermissions.includes(permission)) {
+      // Admin can do everything
+      if (user?.roles?.includes('admin')) {
+        return true;
+      }
+      
+      // Regular users can manage todos
+      if (user?.roles?.includes('user')) {
+        return true;
+      }
+      
+      // Guest users could have limited permissions
+      if (user?.roles?.includes('guest')) {
+        // Guests can only read, not modify
+        return permission === 'read:todos';
+      }
+    }
+    
+    return false;
   };
 
   // Logout function

@@ -14,6 +14,7 @@ export const GET = handleAuth({
       scope: 'openid profile email',
       // Add state parameter for CSRF protection
       state: generateState(),
+      audience: 'https://fifolio.app.com/',
     },
     getLoginState: () => {
       // This object will be stored with the state to help prevent CSRF

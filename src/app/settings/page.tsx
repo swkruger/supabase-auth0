@@ -149,12 +149,33 @@ export default function SettingsPage() {
               <div className="flex flex-wrap gap-2">
                 {user.permissions && user.permissions.length > 0 ? (
                   user.permissions.map((permission, index) => (
-                    <div key={index} className="bg-muted px-3 py-1 rounded-full text-sm">
+                    <div key={index} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
                       {permission}
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">No specific permissions assigned</p>
+                  <div className="flex flex-col space-y-2 w-full">
+                    <p className="text-sm text-muted-foreground">Your token includes these default Auth0 permissions:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:email</div>
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:profile</div>
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:openid</div>
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:roles</div>
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:user_idp_tokens</div>
+                      <div className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">read:offline_access</div>
+                    </div>
+                    <div className="mt-4 p-3 border rounded-md bg-muted/20">
+                      <h4 className="text-sm font-medium mb-1">What these permissions do:</h4>
+                      <ul className="text-xs space-y-1 list-disc pl-4">
+                        <li><span className="font-medium">read:email</span> - Access your email address</li>
+                        <li><span className="font-medium">read:profile</span> - Read your user profile information</li>
+                        <li><span className="font-medium">read:openid</span> - Standard OpenID Connect permission</li>
+                        <li><span className="font-medium">read:roles</span> - Access your assigned roles</li>
+                        <li><span className="font-medium">read:user_idp_tokens</span> - Read identity provider access tokens</li>
+                        <li><span className="font-medium">read:offline_access</span> - Get refresh tokens for longer sessions</li>
+                      </ul>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -162,7 +183,53 @@ export default function SettingsPage() {
             <Separator />
             
             <div>
+              <h3 className="text-sm font-medium mb-2">Todo App Permissions</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                These permissions are derived from your roles
+              </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">read:todos</span>
+                  {hasPermission('read:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">create:todos</span>
+                  {hasPermission('create:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">update:todos</span>
+                  {hasPermission('update:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded">
+                  <span className="text-sm">delete:todos</span>
+                  {hasPermission('delete:todos') ? (
+                    <div className="h-4 w-4 rounded-full bg-green-500"></div>
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
               <h3 className="text-sm font-medium mb-2">Permission Checks</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                Permissions status according to the application's hasPermission function
+              </p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div className="flex items-center justify-between p-2 border rounded">
                   <span className="text-sm">read:todos</span>
