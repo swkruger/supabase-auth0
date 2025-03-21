@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import LoginButton from './components/LoginButton';
 
 export default function Home() {
   return (
@@ -28,11 +29,7 @@ export default function Home() {
             beautifully designed Todo app.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Link href="/login">
-              <Button size="lg" className="w-full">
-                Get Started
-              </Button>
-            </Link>
+            <LoginButton />
           </div>
           <div className="pt-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

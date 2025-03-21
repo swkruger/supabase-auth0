@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AuthProvider } from "./contexts/AuthContext";
 import { Topbar } from "./components/Topbar";
 import { Sidebar } from "./components/Sidebar";
@@ -30,17 +31,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <div className="flex flex-col h-screen">
-            <Topbar />
-            <div className="flex flex-1 overflow-hidden">
-              <Sidebar />
-              <main className="flex-1 overflow-y-auto p-4">
-                {children}
-              </main>
+        <UserProvider>
+          <AuthProvider>
+            <div className="flex flex-col h-screen">
+              <Topbar />
+              <div className="flex flex-1 overflow-hidden">
+                <Sidebar />
+                <main className="flex-1 overflow-y-auto p-4">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-        </AuthProvider>
+          </AuthProvider>
+        </UserProvider>
       </body>
     </html>
   );

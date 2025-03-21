@@ -1,19 +1,15 @@
-import type { NextRequest } from "next/server"
+import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 
-import { auth0 } from "./app/lib/auth0"
+// Use the withMiddlewareAuthRequired function to protect specific routes
+export default withMiddlewareAuthRequired();
 
-export async function middleware(request: NextRequest) {
-  return await auth0.middleware(request)
-}
-
+// Define specific routes to protect, not all routes
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    // Protect authenticated routes
+    '/todos/:path*',
+    '/dashboard/:path*',
+    '/settings/:path*',
+    '/admin/:path*',
   ],
-}
+};

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   // Redirect if already authenticated
@@ -17,9 +17,10 @@ export default function LoginPage() {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  // Mock login handler
+  // Auth0 login handler
   const handleLogin = () => {
-    login();
+    // Redirect to Auth0 login endpoint
+    window.location.href = "/api/auth/login";
   };
 
   if (isLoading) {
@@ -36,38 +37,17 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account
+            Sign in with Auth0 to access your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                placeholder="john@example.com"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                defaultValue="john@example.com"
-                readOnly
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password">Password</label>
-              </div>
-              <input
-                id="password"
-                type="password"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                defaultValue="password"
-                readOnly
-              />
-            </div>
+          <div className="text-center text-sm text-muted-foreground mb-4">
+            You will be redirected to Auth0 for secure authentication
           </div>
         </CardContent>
         <CardFooter>
           <Button className="w-full" onClick={handleLogin}>
-            Login
+            Continue with Auth0
           </Button>
         </CardFooter>
       </Card>

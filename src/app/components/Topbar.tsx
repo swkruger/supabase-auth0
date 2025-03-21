@@ -16,6 +16,11 @@ import {
 export function Topbar() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
+  // Auth0 login handler
+  const handleLogin = () => {
+    window.location.href = "/api/auth/login";
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b bg-background px-4 py-3 shadow-sm">
       <div className="flex h-8 items-center justify-between">
@@ -66,11 +71,9 @@ export function Topbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/login">
-              <Button variant="default" size="sm">
-                Log in
-              </Button>
-            </Link>
+            <Button variant="default" size="sm" onClick={handleLogin}>
+              Log in
+            </Button>
           )}
         </div>
       </div>

@@ -2,13 +2,16 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useUser } from '@auth0/nextjs-auth0/client';
 
-// Mock user type
+// User type
 export type User = {
   id: string;
   name: string;
   email: string;
   avatar: string;
+  roles: string[]; // Add roles
+  permissions: string[]; // Add permissions
 };
 
 // Authentication context type
@@ -16,16 +19,9 @@ type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: () => void;
+  isAdmin: boolean; // Add admin role check
+  hasPermission: (permission: string) => boolean; // Check specific permissions
   logout: () => void;
-};
-
-// Mock user data
-const MOCK_USER: User = {
-  id: "user-1",
-  name: "John Doe",
-  email: "john@example.com",
-  avatar: "https://api.dicebear.com/7.x/initials/svg?seed=JD",
 };
 
 // Create context with default values
@@ -33,7 +29,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  login: () => {},
+  isAdmin: false,
+  hasPermission: () => false,
   logout: () => {},
 });
 
@@ -42,27 +39,35 @@ export const useAuth = () => useContext(AuthContext);
 
 // Auth provider component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { user: auth0User, isLoading: auth0Loading, error } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
-  // Check if user is authenticated
+  // Process Auth0 user data
   useEffect(() => {
-    // Simulate loading auth state
-    const timer = setTimeout(() => {
-      // Get auth from localStorage (for mock purposes)
-      const storedUser = localStorage.getItem("mockUser");
-      
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    if (!auth0Loading) {
+      if (auth0User) {
+        // In a real app, roles and permissions would come from Auth0 user metadata
+        // For now, we'll simulate by setting mock data or using Auth0 data if available
+        const roles = auth0User.roles || ['user']; // Default to 'user' role
+        const permissions = auth0User.permissions || [];
+
+        setUser({
+          id: auth0User.sub || '',
+          name: auth0User.name || '',
+          email: auth0User.email || '',
+          avatar: auth0User.picture || `https://api.dicebear.com/7.x/initials/svg?seed=${auth0User.name?.charAt(0) || 'X'}`,
+          roles: Array.isArray(roles) ? roles : ['user'],
+          permissions: Array.isArray(permissions) ? permissions : [],
+        });
+      } else {
+        setUser(null);
       }
-      
       setIsLoading(false);
-    }, 1000); // 1 second delay to simulate auth loading
-    
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [auth0User, auth0Loading]);
 
   // Redirect authenticated users from welcome page to todos
   useEffect(() => {
@@ -71,27 +76,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, user, pathname, router]);
 
-  // Login function
-  const login = () => {
-    setUser(MOCK_USER);
-    localStorage.setItem("mockUser", JSON.stringify(MOCK_USER));
-    router.push("/todos");
+  // Check if user has admin role
+  const isAdmin = user?.roles.includes('admin') || false;
+
+  // Check if user has a specific permission
+  const hasPermission = (permission: string): boolean => {
+    return user?.permissions.includes(permission) || false;
   };
 
   // Logout function
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("mockUser");
-    router.push("/");
+    // Auth0 logout is handled via a redirect to the logout route
+    router.push("/api/auth/logout");
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isLoading,
+        isLoading: isLoading || auth0Loading,
         isAuthenticated: !!user,
-        login,
+        isAdmin,
+        hasPermission,
         logout,
       }}
     >
