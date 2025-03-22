@@ -3,8 +3,11 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AuthProvider } from "./contexts/AuthContext";
+import { SidebarProvider } from "./contexts/SidebarContext";
 import { Topbar } from "./components/Topbar";
 import { Sidebar } from "./components/Sidebar";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/app/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,23 +30,38 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${robotoMono.variable} antialiased min-h-screen flex flex-col`}
+        className={cn(
+          inter.variable, 
+          robotoMono.variable, 
+          "antialiased bg-background min-h-screen"
+        )}
       >
-        <UserProvider>
-          <AuthProvider>
-            <div className="flex flex-col h-screen">
-              <Topbar />
-              <div className="flex flex-1 overflow-hidden">
-                <Sidebar />
-                <main className="flex-1 overflow-y-auto p-4">
-                  {children}
-                </main>
-              </div>
-            </div>
-          </AuthProvider>
-        </UserProvider>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange
+        >
+          <UserProvider>
+            <AuthProvider>
+              <SidebarProvider>
+                <div className="relative flex min-h-screen flex-col">
+                  <Topbar />
+                  <div className="flex flex-1 overflow-hidden">
+                    <Sidebar />
+                    <main className="flex-1 overflow-y-auto p-6 pt-4">
+                      <div className="container mx-auto max-w-7xl">
+                        {children}
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              </SidebarProvider>
+            </AuthProvider>
+          </UserProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

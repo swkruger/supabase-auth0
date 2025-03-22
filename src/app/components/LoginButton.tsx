@@ -3,6 +3,8 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginButton() {
   const { user, error, isLoading } = useUser();
@@ -21,44 +23,45 @@ export default function LoginButton() {
   
   if (isLoading) {
     return (
-      <button 
-        disabled
-        className="bg-gray-400 text-white px-4 py-2 rounded text-sm cursor-not-allowed"
-      >
-        <span className="inline-block animate-pulse">Loading...</span>
-      </button>
+      <Button disabled variant="outline" size="sm">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Loading
+      </Button>
     );
   }
   
   // Show a generic error message instead of exposing error details
   if (error) {
     return (
-      <button 
+      <Button 
         onClick={() => router.refresh()}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm"
+        variant="destructive"
+        size="sm"
       >
         Try Again
-      </button>
+      </Button>
     );
   }
   
   if (user) {
     return (
-      <a 
-        href="/api/auth/logout"
-        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
+      <Button 
+        asChild
+        variant="destructive"
+        size="sm"
       >
-        Logout
-      </a>
+        <a href="/api/auth/logout">Logout</a>
+      </Button>
     );
   }
   
   return (
-    <a 
-      href="/api/auth/login"
-      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+    <Button 
+      asChild
+      variant="default"
+      size="sm"
     >
-      Login
-    </a>
+      <a href="/api/auth/login">Login</a>
+    </Button>
   );
 } 
